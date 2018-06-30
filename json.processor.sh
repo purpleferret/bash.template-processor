@@ -6,17 +6,19 @@ OUTPUT_DIR="${MY_DIR}/output"
 SUFFIX="json"
 
 processJson() {
-    FILE_IDENTIFIER="$1"
+    FILE_IDENTIFIER="${1}"
     cleanUp
     createDirectories
-    ( echo "cat <<EOF >${OUTPUT_DIR}/final.${SUFFIX}";
-    cat ${FILE_IDENTIFIER}template.${SUFFIX};
-    echo "EOF";
-    ) >"${TMP_DIR}"/temp.${SUFFIX}
-
-    . "${TMP_DIR}"/temp.${SUFFIX}
-    rm "${TMP_DIR}"/temp.${SUFFIX}
-    cat "${OUTPUT_DIR}"/final.${SUFFIX}
+    OUTPUT_FILE="${OUTPUT_DIR}/final.${SUFFIX}"
+    TMP_FILE="${TMP_DIR}/temp.${SUFFIX}"
+    ( printf 'cat <<EOF >"%s"\n' "${OUTPUT_FILE}";
+    cat "${FILE_IDENTIFIER}"template.${SUFFIX};
+    printf "EOF\n";
+    ) >"${TMP_FILE}"
+    . "${TMP_FILE}"
+    rm "${TMP_FILE}"
+    printf "%s:%s output %s:\n" "${0}" "${FUNCNAME}" "${OUTPUT_FILE}" >&2
+    cat "${OUTPUT_FILE}"
 }
 
 createDirectories() {
@@ -25,7 +27,12 @@ createDirectories() {
 }
 
 cleanUp() {
-    rm -f "${OUTPUT_DIR}"/final.${SUFFIX} "${TMP_DIR}"/*
+    printf "%s:%s\n" "${0}" "${FUNCNAME}" >&2
+    find "${OUTPUT_DIR}/final.${SUFFIX}" "${TMP_DIR}" -delete
 }
 
-processJson "$1"
+main() {
+    processJson "${1}"
+}
+
+main "${1}"
