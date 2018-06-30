@@ -1,0 +1,5 @@
+{
+    "timeEntries": {
+        "3monthAgoPlus7Days": "$(date '+%Y-%m-%dT%H:%M:%S.%3NZ' -d '-3 months +7 days')"
+    }
+}
